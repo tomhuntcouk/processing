@@ -1,0 +1,59 @@
+
+/*input {
+	display: block;
+}*/
+
+main {
+	width:  fit-content;
+	/*background: blue;*/
+	float: left;
+}
+
+#interface {
+	width: fit-content;
+	background: green;
+	float: right;
+}
+
+#controls {
+	width : fit-content;
+	height:  fit-content;
+	background: red;
+	/*float: right;*/
+}
+
+#snapshots {
+	width: 100%;
+	/*height: 100%;*/
+	/*background: blue;*/
+	/*float: right;*/
+}
+
+.snapshot-container {
+	display: block;
+}
+
+#snapshots button {
+	width: 100%;
+}
+
+#snapshots button.snapshots-button-load {
+	width: 200px;
+	float: left;
+}
+
+#snapshots button.snapshots-button-del {
+	width:  20px;
+	float: right;
+}
+
+.slider-label {
+	width:  100px;
+	display: inline-block;
+}
+
+.slider-display {
+	width:  50px;
+	display: inline-block;
+	text-align: right;
+}
