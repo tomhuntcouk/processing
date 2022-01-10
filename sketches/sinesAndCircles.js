@@ -5,7 +5,7 @@ var slider3;
 
 const WIDTH = 150;
 const HEIGHT = 150;
-const SCALEMULT = 2;
+const SCALEMULT = 4;
 
 let _matrix;
 
@@ -21,7 +21,8 @@ function setup() {
 	createCanvas(WIDTH * SCALEMULT, HEIGHT * SCALEMULT);
 	noLoop();
 
-	_matrix = new Matrix( drawingContext );
+	// _matrix = new Matrix( drawingContext );
+	_matrix = new Matrix( );
 	
 	controls = new Controls();
 	snapshots = new Snapshots(controls);
@@ -69,19 +70,24 @@ function print() {
 		}
 	}
 	circlePrint.position = _matrix.applyToPoint( circlePrint.position.x, circlePrint.position.y );
+	circlePrint.position.x = float(circlePrint.position.x).toFixed(1);
+	circlePrint.position.y = float(circlePrint.position.x).toFixed(1);
 	printCommands['circle'] = circlePrint;
 
 	// _lines
 	let linesPrint = [];
 	const stretch = controls.getValue('stretch');
 	for( const line of _lines.lines ) {
-		let lineInfo = {
-			x : ((line.offset * WIDTH) / 10),
-			y : ((line.length * HEIGHT) / 10)
+		let lineInfo = [];
+		for ( p of line.points ) {
+			lineInfo.push( { 
+				'x': ((p.x / 10) / SCALEMULT).toFixed(2),
+				'y': ((p.y / 10) / SCALEMULT).toFixed(2),
+			} );
 		}
-		console.log(lineInfo);
-		lineInfo = _matrix.applyToPoint( lineInfo.x, lineInfo.y );
-		console.log(lineInfo);
+
+
+		// console.log(lineInfo);
 		linesPrint.push(lineInfo);
 	}
 	printCommands['lines'] = linesPrint;
@@ -158,7 +164,7 @@ function draw() {
 
   // push();
   _matrix.translate( -((controls.getValue('stretch') - 1 ) / 2) * width, 0, 0 );
-  _lines.render();
+  _lines.render( _matrix );
   _matrix.translate( ((controls.getValue('stretch') - 1 ) / 2) * width, 0, 0 );
   // pop();
   
