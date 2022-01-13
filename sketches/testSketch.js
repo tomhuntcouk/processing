@@ -25,12 +25,18 @@ window.setup = function() {
 	controls.addControl( 'time', 0, 10, 0, 0.01 );
 
 	Snapshots.init( 'Test1' );
-	// Snapshots.loadSnapshots();
+	Snapshots.applyLatest();
 
 }
 
 
 window.draw = function() {
+
+
+	Snapshots.saveLatest();
+
+
+
 	clear();
 	background(255, 243, 212); 
 	noFill();
