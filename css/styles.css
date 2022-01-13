@@ -34,17 +34,22 @@ main {
 }
 
 #snapshots button {
+	width: 25px;
+	height: 25px;
+}
+
+#snapshots button.add-snapshot-btn {
 	width: 100%;
 }
 
 #snapshots button.snapshots-button-load {
-	width: 200px;
 	float: left;
 }
 
 #snapshots button.snapshots-button-del {
-	width:  20px;
-	float: right;
+	float: left;
+	display: none;
+	background-color: red;
 }
 
 .slider-label {
