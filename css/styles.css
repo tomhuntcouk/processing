@@ -62,3 +62,7 @@ main {
 	display: inline-block;
 	text-align: right;
 }
+
+#renderer button.renderer-button {
+	width: 100%;
+}

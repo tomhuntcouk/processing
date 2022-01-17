@@ -5,6 +5,7 @@ import Grid from '../lib/Grid.js';
 
 import Controls from '../lib/Controls.js';
 import Snapshots from '../lib/Snapshots.js';
+import Renderer from '../lib/Renderer.js';
 
 import * as TransMatrix from '../lib/Matrix.js';
 
@@ -22,14 +23,14 @@ window.setup = function() {
 	Canvas.create(
 		150,
 		150,
-		2
+		4
 	);
 
 	// c = new Circle( 'circle1' );
 	// l = new Line( 'line1' );
 
 	circleControls = Controls.addGroup( 'circles' );
-	circleControls.addControl( 'radius', 0, width, 20, 1 );
+	circleControls.addControl( 'radius', 0, Canvas.width, 20, 1 );
 	circleControls.addControl( 'start', 0, 1, 0, 0.01 );
 	circleControls.addControl( 'end', 0, 1, 0, 0.01 );
 	circleControls.addControl( 'rotate', 0, 360, 0, 0.01 );
@@ -38,8 +39,8 @@ window.setup = function() {
 	circleControls.addControl( 'freq', 0, 0.1, 0, 0.01 );
 
 	gridControls = Controls.addGroup( 'grid' );
-	gridControls.addControl( 'width', 0, width, 1, 1 );
-	gridControls.addControl( 'height', 0, height, 1, 1 );
+	gridControls.addControl( 'width', 0, Canvas.width, 1, 1 );
+	gridControls.addControl( 'height', 0, Canvas.height, 1, 1 );
 	gridControls.addControl( 'xres', 0, 100, 1, 1 );
 	gridControls.addControl( 'yres', 0, 100, 1, 1 );
 	gridControls.addControl( 'noise', 0, 100, 0, 0.1 );
@@ -48,6 +49,9 @@ window.setup = function() {
 	timeControls = Controls.addGroup( 'time' );
 	timeControls.addControl( 'time', 0, 10, 0, 0.01 );
 	timeControls.addControl( 'loop', 0, 1, 0, 1 );
+
+
+	Renderer.init();
 
 	Snapshots.init( 'Test1' );
 	Snapshots.applyLatest();
@@ -70,7 +74,7 @@ window.draw = function() {
 	noFill();
 
 	Canvas.pushMatrix();
-	// Canvas.translate( -width/2, -height/2 );
+	Canvas.translate( width/2, height/2 );
 
 	let grid = new Grid();
 	grid.create( 
@@ -104,7 +108,7 @@ window.draw = function() {
 
 
 	// for( let vert of grid.vertices ) {
-	for( let i=1; i<grid.vertices.length; i++ ) {
+	for( let i=0; i<grid.vertices.length; i++ ) {
 		let vert = grid.vertices[i];
 
 		let t = i / r;
@@ -144,35 +148,6 @@ window.draw = function() {
 		i++;
 	}
 
-
-	// l.create( 
-	// 	new TransMatrix.Vector3( 0, 0 ),
-	// 	new TransMatrix.Vector3( width, height ),
-	// 	20
-	// );
-	// l.render();
-
 	Canvas.popMatrix();
-
-	// c.create(
-	// 	c.controls.getValue('radius'),		
-	// 	c.controls.getValue('resolution'),
-	// 	new TransMatrix.Vector3(),
-	// 	c.controls.getValue('start'),
-	// 	c.controls.getValue('end')
-	// );
-
-	// c.rotate( c.controls.getValue('rotate'), 'Y' );
-
-	// c.noise( 
-	// 	controls.getValue('noise'),
-	// 	controls.getValue('freq'),
-	// 	controls.getValue('time')
-	// );
-	
-
-	// c.render();
-
-	
 
 }
