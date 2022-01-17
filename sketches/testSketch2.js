@@ -13,6 +13,10 @@ let gridControls;
 let timeControls;
 
 let c, l;
+let rotation = new TransMatrix.Vector3();
+let rx = 0;
+let ry = 0;
+let rz = 0;
 
 window.setup = function() {
 	Canvas.create(
@@ -25,10 +29,13 @@ window.setup = function() {
 	// l = new Line( 'line1' );
 
 	circleControls = Controls.addGroup( 'circles' );
-	circleControls.addControl( 'radius', 0, 100, 20, 1 );
+	circleControls.addControl( 'radius', 0, width, 20, 1 );
 	circleControls.addControl( 'start', 0, 1, 0, 0.01 );
 	circleControls.addControl( 'end', 0, 1, 0, 0.01 );
 	circleControls.addControl( 'rotate', 0, 360, 0, 0.01 );
+	circleControls.addControl( 'rotateY', 0, 360, 0, 0.01 );
+	circleControls.addControl( 'noise', 0, 1, 0, 0.01 );
+	circleControls.addControl( 'freq', 0, 0.1, 0, 0.01 );
 
 	gridControls = Controls.addGroup( 'grid' );
 	gridControls.addControl( 'width', 0, width, 1, 1 );
@@ -39,7 +46,8 @@ window.setup = function() {
 	gridControls.addControl( 'freq', 0, 300, 0, 0.1 );
 	
 	timeControls = Controls.addGroup( 'time' );
-	gridControls.addControl( 'time', 0, 10, 0, 0.01 );
+	timeControls.addControl( 'time', 0, 10, 0, 0.01 );
+	timeControls.addControl( 'loop', 0, 1, 0, 1 );
 
 	Snapshots.init( 'Test1' );
 	Snapshots.applyLatest();
@@ -49,10 +57,13 @@ window.setup = function() {
 
 window.draw = function() {
 
+	if( timeControls.getValue( 'loop' ) ) {
+		loop();
+	} else {
+		noLoop();
+	}
 
 	Snapshots.saveLatest();
-
-
 
 	clear();
 	background(255, 243, 212); 
@@ -69,30 +80,69 @@ window.draw = function() {
 		gridControls.getValue('height'),		
 	);	
 	grid.center();
-	grid.noise(
-		gridControls.getValue( 'noise' ),
-		gridControls.getValue( 'freq' ),
-		gridControls.getValue( 'time' )
-	);
+	// grid.noise(
+	// 	gridControls.getValue( 'noise' ),
+	// 	gridControls.getValue( 'freq' ),
+	// 	gridControls.getValue( 'time' )
+	// );
 
-	// fill(0);
-	for( let vert of grid.vertices ) {
+	
+	let i = 0;
+	let r = grid.vertices.length;
+
+	let startscale = new TransMatrix.Vector3(1,1,1);
+	let endscale = new TransMatrix.Vector3();
+
+	const rotationInc = new TransMatrix.Vector3(
+		noise( frameCount, 0, 0 ),
+		noise( 0, frameCount, 0 ),
+		noise( 0, 0, frameCount )
+	);
+	rx += rotationInc.x;
+	ry += rotationInc.y;
+	rz += rotationInc.z;
+
+
+	// for( let vert of grid.vertices ) {
+	for( let i=1; i<grid.vertices.length; i++ ) {
+		let vert = grid.vertices[i];
+
+		let t = i / r;
+
 		let myc = new Circle();
 		myc.create(
 			circleControls.getValue('radius'),
-			100,
+			150,
 			new TransMatrix.Vector3(),
 			circleControls.getValue('start'),
 			circleControls.getValue('end')
 		);
-		myc.rotate( noise( vert.x, vert.y ) * circleControls.getValue('rotate') );
+		myc.close();
+			
+
+		// myc.rotate( random() * circleControls.getValue('rotate') );
+		let scale = TransMatrix.Vector3.lerp( startscale, endscale, t );
+		myc.scale( scale );
 		myc.translate( vert );
+		
+
+		myc.rotate( circleControls.getValue('rotateY'), 'Y' );
+
+		myc.noiseSpherical( 
+			circleControls.getValue('noise'),
+			circleControls.getValue('freq'),
+			timeControls.getValue('time'),
+			new TransMatrix.Vector3(
+				rx, ry, rz
+			)
+		);
+
+		// myc.rotate( -circleControls.getValue('rotateY'), 'Y' );
 
 		myc.render();
+
+		i++;
 	}
-
-
-	
 
 
 	// l.create( 
