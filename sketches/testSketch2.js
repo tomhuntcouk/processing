@@ -1,3 +1,5 @@
+"use strict";
+
 import Canvas from '../lib/Canvas.js';
 import Line from '../lib/Line.js';
 import Circle from '../lib/Circle.js';
@@ -9,9 +11,16 @@ import Renderer from '../lib/Renderer.js';
 
 import * as TransMatrix from '../lib/Matrix.js';
 
+const NAME = 'Test1';
+const WIDTH = 300;
+const HEIGHT = 300;
+const SCALE = 2;
+
 let circleControls;
 let gridControls;
 let timeControls;
+
+// let renderer;
 
 let c, l;
 let rotation = new TransMatrix.Vector3();
@@ -19,24 +28,35 @@ let rx = 0;
 let ry = 0;
 let rz = 0;
 
+
+
+// window.preload = function() {
+// 	renderer = new Renderer(  );
+// }
+
+
 window.setup = function() {
 	Canvas.create(
-		150,
-		150,
-		4
+		NAME,
+		WIDTH,
+		HEIGHT,
+		SCALE
 	);
 
 	// c = new Circle( 'circle1' );
 	// l = new Line( 'line1' );
 
 	circleControls = Controls.addGroup( 'circles' );
+	circleControls.addControl( 'resolution', 4, 200, 100, 1 );
 	circleControls.addControl( 'radius', 0, Canvas.width, 20, 1 );
 	circleControls.addControl( 'start', 0, 1, 0, 0.01 );
 	circleControls.addControl( 'end', 0, 1, 0, 0.01 );
 	circleControls.addControl( 'rotate', 0, 360, 0, 0.01 );
 	circleControls.addControl( 'rotateY', 0, 360, 0, 0.01 );
+	circleControls.addControl( 'rotateScaler', 0, 1, 1, 0.01 );
 	circleControls.addControl( 'noise', 0, 1, 0, 0.01 );
 	circleControls.addControl( 'freq', 0, 0.1, 0, 0.01 );
+	circleControls.addControl( 'close', 0, 1, 0, 1 );
 
 	gridControls = Controls.addGroup( 'grid' );
 	gridControls.addControl( 'width', 0, Canvas.width, 1, 1 );
@@ -51,9 +71,9 @@ window.setup = function() {
 	timeControls.addControl( 'loop', 0, 1, 0, 1 );
 
 
-	Renderer.init();
+	Renderer.init( drawingContext );
 
-	Snapshots.init( 'Test1' );
+	Snapshots.init( NAME );
 	Snapshots.applyLatest();
 
 }
@@ -83,7 +103,7 @@ window.draw = function() {
 		gridControls.getValue('width'),
 		gridControls.getValue('height'),		
 	);	
-	grid.center();
+	// grid.center();
 	// grid.noise(
 	// 	gridControls.getValue( 'noise' ),
 	// 	gridControls.getValue( 'freq' ),
@@ -116,21 +136,23 @@ window.draw = function() {
 		let myc = new Circle();
 		myc.create(
 			circleControls.getValue('radius'),
-			150,
+			circleControls.getValue('resolution'),
 			new TransMatrix.Vector3(),
 			circleControls.getValue('start'),
 			circleControls.getValue('end')
 		);
-		myc.close();
+
+		if( circleControls.getValue('close') ) {
+			myc.close();	
+		}		
 			
 
-		// myc.rotate( random() * circleControls.getValue('rotate') );
 		let scale = TransMatrix.Vector3.lerp( startscale, endscale, t );
 		myc.scale( scale );
 		myc.translate( vert );
 		
 
-		myc.rotate( circleControls.getValue('rotateY'), 'Y' );
+		// myc.rotate( circleControls.getValue('rotateY'), 'Y' );
 
 		myc.noiseSpherical( 
 			circleControls.getValue('noise'),
@@ -141,7 +163,11 @@ window.draw = function() {
 			)
 		);
 
-		// myc.rotate( -circleControls.getValue('rotateY'), 'Y' );
+		myc.rotate( 90 + sin(frameCount * 0.01) * circleControls.getValue('rotate') );
+		if( t > circleControls.getValue('rotateScaler') ) {
+			myc.rotate( circleControls.getValue('rotateY'), 'Y' );	
+		}
+		
 
 		myc.render();
 
@@ -149,5 +175,8 @@ window.draw = function() {
 	}
 
 	Canvas.popMatrix();
+
+
+	Renderer.recordFrame();
 
 }
