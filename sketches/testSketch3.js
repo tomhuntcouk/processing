@@ -58,6 +58,8 @@ window.setup = function() {
 	circleControls.addControl( 'noise', 0, 1, 0, 0.01 );
 	circleControls.addControl( 'freq', 0, 0.1, 0, 0.01 );
 	circleControls.addControl( 'close', 0, 1, 0, 1 );
+	circleControls.addControl( 'fill', 0, 1, 0, 1 );
+	circleControls.addControl( 'stroke', 0, 1, 0, 0.1 );
 
 	gridControls = Controls.addGroup( 'grid' );
 	gridControls.addControl( 'width', 0, Canvas.width, 1, 1 );
@@ -91,7 +93,7 @@ window.draw = function() {
 
 	clear();
 	background(255, 243, 212); 
-	noFill();
+	// noFill();
 
 	Canvas.pushMatrix();
 	Canvas.translate( width/2, height/2 );
@@ -166,12 +168,28 @@ window.draw = function() {
 					rx, ry, rz
 				)			
 			);
-			// myc.rotate( random(0, 1) * circleControls.getValue('rotate'));
+			myc.rotate( random(0, 1) * circleControls.getValue('rotate'));
+			myc.rotate( circleControls.getValue('rotateY'), 'X');
 			
 			
 			
 			myc.translate(vert);
 
+			const sv = circleControls.getValue( 'stroke' );
+			if( sv == 0 ) {
+				noStroke();
+			} else {
+				stroke(sv * 255);
+			}
+			
+			
+
+			if( circleControls.getValue( 'fill' ) ) {
+				fill( 255 * sin(PI*t2*0.5) );	
+			} else{
+				noFill();
+			}
+			
 			myc.render();
 		}
 
