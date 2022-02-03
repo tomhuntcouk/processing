@@ -179,7 +179,11 @@ window.draw = function() {
 			if( sv == 0 ) {
 				noStroke();
 			} else {
-				stroke(sv * 255);
+				// if( j == 0 ) {
+					stroke(sv * 255);
+				// } else {
+					// noStroke();
+				// }
 			}
 			
 			
