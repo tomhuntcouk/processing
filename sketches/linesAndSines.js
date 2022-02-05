@@ -17,10 +17,10 @@ import * as TransMatrix from '../lib/Matrix.js';
 const NAME = 'LinesAndSines';
 const WIDTH = 150;
 const HEIGHT = 150;
-const SCALE = 2;
+const SCALE = 1;
 
 // let circleControls;
-let gridControls, borderControls, sineControls, mask;
+let gridControls, borderControls, sineControls, maskControls;
 // let timeControls;
 
 
@@ -36,6 +36,10 @@ window.setup = function() {
 	gridControls = Controls.addGroup( 'grid' );
 	gridControls.addControl( 'xres', 1, 100, 1, 2 );
 	gridControls.addControl( 'xoffset', -width, width, 0, 1 );
+
+	maskControls = Controls.addGroup( 'mask' );
+	maskControls.addControl( 'radius', 1, 100, 1, 1 );
+	maskControls.addControl( 'resolution', 3, 50, 20, 1 );
 
 	sineControls = Controls.addGroup( 'sine' );
 	sineControls.addControl( 'frequency', 0, 10, 1, 1 );
@@ -90,7 +94,11 @@ window.draw = function() {
 
 
 	let mask = new PolygonMask();
-	mask.createSquare();
+	mask.createCircle(
+		maskControls.getValue( 'radius' ),
+		maskControls.getValue( 'resolution' ),
+	);
+	// mask.render();
 
 
 
@@ -104,8 +112,8 @@ window.draw = function() {
 
 		line.create( start, end, 20);
 		// border.cropPointList( line );
-		mask.maskPointList( line );
 		
+		mask.maskPointList( line );
 		line.render();
 		// line.renderPoints();
 		// break;
