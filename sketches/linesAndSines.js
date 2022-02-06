@@ -39,8 +39,8 @@ window.setup = function() {
 
 	maskControls = Controls.addGroup( 'mask' );
 	maskControls.addControl( 'radius', 1, 100, 1, 1 );
-	maskControls.addControl( 'resolution', 3, 360, 20, 1 );
-	maskControls.addControl( 'rotation', 0, 360, 0, 1 );
+	maskControls.addControl( 'resolution', 3, 180, 20, 1 );
+	maskControls.addControl( 'rotation', 0, 360, 0, 5 );
 	maskControls.addControl( 'noiseFreq', 0, 0.1, 0, 0.01 );
 	maskControls.addControl( 'noiseAmp', 0, 1, 0, 0.1 );
 
@@ -50,9 +50,6 @@ window.setup = function() {
 	sineControls.addControl( 'offset', -1, 1, 0, 0.01 );
 	sineControls.addControl( 'amplitude', 0, 100, 1, 1 );
 
-
-	borderControls = Controls.addGroup( 'border' );
-	borderControls.addControl( 'borderWidth', 0, 100, 20, 1 );
 
 	// Renderer.init( drawingContext );
 
@@ -121,26 +118,15 @@ window.draw = function() {
 
 		const line = new Line();		
 		const start = TransMatrix.Vector3.add( gridvert, [0, -Canvas.height/2, 0] );
-		// const end = TransMatrix.Vector3.add( start, [0, Canvas.height, 0] );
 		const end = TransMatrix.Vector3.add( start, [0, Canvas.height, 0] );
 
 		line.create( start, end, 20);
-		// border.cropPointList( line );
 		
 		mask.maskPointList( line );
 		line.render();
-		// line.renderPoints();
-		// break;
-
-
 		
-		// line.renderPoints();
 
 	}
-
-	// border.render();
-	// mask.render();
-
 
 	
 }

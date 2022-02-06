@@ -1,26 +1,46 @@
 
-/*input {
-	display: block;
-}*/
+html {
+	font-family: sans-serif;
+	font-size: small;
+}
 
 main {
 	width:  fit-content;
 	/*background: blue;*/
-	float: left;
+	float: left;	
 }
 
 #interface {
 	width: fit-content;
-	background: green;
 	float: right;
+	position: fixed;
+	right: 50px;
 }
 
 #controls {
 	width : fit-content;
-	height:  fit-content;
-	background: red;
+	height:  fit-content;	
 	/*float: right;*/
 }
+
+.controls-group {
+	border: solid 1px;
+	padding: 4px;
+	margin-bottom: 10px;
+	border-radius: 4px;
+	background: lightgray;
+}
+
+.controls-group .controls-group-title {
+	text-align: center;
+	padding-bottom: 5px;
+	margin-bottom: 5px;
+	border-bottom: solid 1px;
+	font-size: medium;
+	font-weight: bold;
+	font-variant: small-caps;
+}
+
 
 #snapshots {
 	width: 100%;
@@ -49,7 +69,6 @@ main {
 #snapshots button.snapshots-button-del {
 	float: left;
 	display: none;
-	background-color: red;
 }
 
 .slider-label {
@@ -58,9 +77,13 @@ main {
 }
 
 .slider-display {
-	width:  50px;
+	width:  30px;
 	display: inline-block;
 	text-align: right;
+	margin-left: 10px;
+	border-radius: 4px;
+	border: 1px;
+	padding: 2px;
 }
 
 #renderer button.renderer-button {
