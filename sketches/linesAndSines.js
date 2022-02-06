@@ -20,7 +20,7 @@ const HEIGHT = 150;
 const SCALE = 2;
 
 // let circleControls;
-let gridControls, borderControls, sineControls, maskControls;
+let gridControls, borderControls, sineControls, maskControls, lineControls, circleControls;
 // let timeControls;
 
 
@@ -35,20 +35,28 @@ window.setup = function() {
 
 	gridControls = Controls.addGroup( 'grid' );
 	gridControls.addControl( 'xres', 1, 100, 1, 2 );
-	gridControls.addControl( 'xoffset', -width, width, 0, 1 );
+	// gridControls.addControl( 'xoffset', -width, width, 0, 1 );
 
 	maskControls = Controls.addGroup( 'mask' );
 	maskControls.addControl( 'radius', 1, 100, 1, 1 );
 	maskControls.addControl( 'resolution', 3, 180, 20, 1 );
 	maskControls.addControl( 'rotation', 0, 360, 0, 5 );
 	maskControls.addControl( 'noiseFreq', 0, 0.1, 0, 0.01 );
-	maskControls.addControl( 'noiseAmp', 0, 1, 0, 0.1 );
+	maskControls.addControl( 'noiseAmp', 0, 1, 0, 0.01 );
 
+	lineControls = Controls.addGroup( 'line' );
+	lineControls.addControl( 'resolution', 3, 180, 20, 1 );
+	lineControls.addControl( 'holiness', 0, 1, 0, 0.01 );
+
+	circleControls = Controls.addGroup( 'circle' );
+	circleControls.addControl( 'radius', 0, Canvas.width, 100, 1 );
+	circleControls.addControl( 'rotation', 0, 360, 0, 5 );
+	circleControls.addControl( 'holiness', 0, 1, 0, 0.01 );
 
 	sineControls = Controls.addGroup( 'sine' );
 	sineControls.addControl( 'frequency', 0, 10, 1, 1 );
 	sineControls.addControl( 'offset', -1, 1, 0, 0.01 );
-	sineControls.addControl( 'amplitude', 0, 100, 1, 1 );
+	sineControls.addControl( 'amplitude', 0, 10, 0, 0.01 );
 
 
 	// Renderer.init( drawingContext );
@@ -94,24 +102,23 @@ window.draw = function() {
 	sine.offsetPointList( grid, sineControls.getValue( 'amplitude' ) );
 
 	
-	let circle = new Circle();
-	circle.create(
+	let maskPoly = new Circle();
+	maskPoly.create(
 		maskControls.getValue( 'radius' ),
 		maskControls.getValue( 'resolution' ),
 	);	
-	circle.noise(
+	maskPoly.noise(
 		maskControls.getValue( 'noiseAmp' ),
 		maskControls.getValue( 'noiseFreq' ),
 	);
-	circle.rotate(
+	maskPoly.rotate(
 		maskControls.getValue( 'rotation' ),
 	);
 
 	let mask = new PolygonMask();
-	mask.createFrom( circle );
+	mask.createFrom( maskPoly );
 	mask.render();
 	
-
 
 	for( let i=0; i<grid.vertices.length; i++ ) {
 		const gridvert = grid.vertices[i];
@@ -120,13 +127,30 @@ window.draw = function() {
 		const start = TransMatrix.Vector3.add( gridvert, [0, -Canvas.height/2, 0] );
 		const end = TransMatrix.Vector3.add( start, [0, Canvas.height, 0] );
 
-		line.create( start, end, 20);
-		
-		mask.maskPointList( line );
-		line.render();
-		
+		line.create( start, end, 
+			lineControls.getValue('resolution')
+		);		
 
+		mask.maskPointList( line );
+		line.addRandomBreaks( lineControls.getValue('holiness') );
+		line.render();
+		// line.renderPoints();
+		
 	}
+
+	let circle = new Circle();
+	circle.create(
+		circleControls.getValue('radius'),
+		360
+	);	
+	circle.addRandomBreaks( 
+		circleControls.getValue('holiness')
+	);
+	circle.rotate( 
+		circleControls.getValue('rotation')
+	);
+	circle.render();
+
 
 	
 }
