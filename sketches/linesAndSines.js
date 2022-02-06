@@ -17,7 +17,7 @@ import * as TransMatrix from '../lib/Matrix.js';
 const NAME = 'LinesAndSines';
 const WIDTH = 150;
 const HEIGHT = 150;
-const SCALE = 1;
+const SCALE = 2;
 
 // let circleControls;
 let gridControls, borderControls, sineControls, maskControls;
@@ -39,7 +39,11 @@ window.setup = function() {
 
 	maskControls = Controls.addGroup( 'mask' );
 	maskControls.addControl( 'radius', 1, 100, 1, 1 );
-	maskControls.addControl( 'resolution', 3, 50, 20, 1 );
+	maskControls.addControl( 'resolution', 3, 360, 20, 1 );
+	maskControls.addControl( 'rotation', 0, 360, 0, 1 );
+	maskControls.addControl( 'noiseFreq', 0, 0.1, 0, 0.01 );
+	maskControls.addControl( 'noiseAmp', 0, 1, 0, 0.1 );
+
 
 	sineControls = Controls.addGroup( 'sine' );
 	sineControls.addControl( 'frequency', 0, 10, 1, 1 );
@@ -92,14 +96,24 @@ window.draw = function() {
 
 	sine.offsetPointList( grid, sineControls.getValue( 'amplitude' ) );
 
-
-	let mask = new PolygonMask();
-	mask.createCircle(
+	
+	let circle = new Circle();
+	circle.create(
 		maskControls.getValue( 'radius' ),
 		maskControls.getValue( 'resolution' ),
+	);	
+	circle.noise(
+		maskControls.getValue( 'noiseAmp' ),
+		maskControls.getValue( 'noiseFreq' ),
 	);
-	// mask.render();
+	circle.rotate(
+		maskControls.getValue( 'rotation' ),
+	);
 
+	let mask = new PolygonMask();
+	mask.createFrom( circle );
+	mask.render();
+	
 
 
 	for( let i=0; i<grid.vertices.length; i++ ) {
