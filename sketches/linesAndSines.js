@@ -20,7 +20,7 @@ const HEIGHT = 150;
 const SCALE = 2;
 
 // let circleControls;
-let gridControls, borderControls, sineControls, maskControls, lineControls, circleControls;
+let gridControls, borderControls, sineControls, maskControls, lineControls, circleControls, lightControls;
 let timeControls;
 
 
@@ -47,12 +47,14 @@ window.setup = function() {
 
 	lineControls = Controls.addGroup( 'line' );
 	lineControls.addSlider( 'resolution', 3, 180, 20, 1 );
-	lineControls.addSlider( 'holiness', 0, 1, 0, 0.01 );
-	lineControls.addSlider( 'lightX', -1, 1, 0, 0.01 );
-	lineControls.addSlider( 'lightY', -1, 1, 0, 0.01 );
-	lineControls.addSlider( 'lightZ', -1, 1, 0, 0.01 );
-	lineControls.addSlider( 'lightIntensity', 0, 2, 1, 0.01 );
+	lineControls.addSlider( 'holiness', 0, 1, 0, 0.01 );	
 	lineControls.addSlider( 'noiseOffsetY', 0, Canvas.height, 0, 0.1 );
+
+	lightControls = Controls.addGroup( 'light' );
+	lightControls.addSlider( 'lightX', -180, 180, 0, 1 );
+	lightControls.addSlider( 'lightY', -180, 180, 0, 1 );
+	lightControls.addSlider( 'lightZ', -180, 180, 0, 1 );
+	lightControls.addSlider( 'lightIntensity', 0, 2, 1, 0.01 );
 
 	circleControls = Controls.addGroup( 'circle' );
 	circleControls.addSlider( 'radius', 0, Canvas.width, 100, 1 );
@@ -97,17 +99,12 @@ window.draw = function() {
 	}
 
 	Time.tick();
+	Controls.tick();
 	Snapshots.saveLatest();
 
 	clear();
 	stroke(0);
-	background(255, 243, 212); 
-	
-
-	// let border = new Border();
-	// border.create(
-	// 	borderControls.getValue( 'borderWidth' )
-	// );
+	background(255, 243, 212);	
 
 	let grid = new Grid();
 	grid.create( 
@@ -144,9 +141,12 @@ window.draw = function() {
 	// mask.render();
 	
 	const lightDir = new TransMatrix.Vector3(
-		lineControls.getValue( 'lightX' ),
-		sin( radians(Time.fixedTime * timeControls.getValue('speed')) ),
-		cos( radians(Time.fixedTime * timeControls.getValue('speed')) ),		
+		// sin( radians( (((lightControls.getValue( 'lightX' ) % 2) * 0.5) - 0.5) * 2 ) ),
+		// sin( radians( (((lightControls.getValue( 'lightY' ) % 2) * 0.5) - 0.5) * 2 ) ),
+		// cos( radians( (((lightControls.getValue( 'lightZ' ) % 2) * 0.5) - 0.5) * 2 ) ),
+		sin( radians( lightControls.getValue( 'lightX' ) ) ),
+		sin( radians( lightControls.getValue( 'lightY' ) ) ),
+		cos( radians( lightControls.getValue( 'lightZ' ) ) ),
 	);
 
 	for( let i=0; i<grid.vertices.length; i++ ) {
@@ -156,11 +156,20 @@ window.draw = function() {
 		const start = TransMatrix.Vector3.add( gridvert, [0, -Canvas.height/2, 0] );
 		const end = TransMatrix.Vector3.add( start, [0, Canvas.height, 0] );
 
+		// Canvas.pushMatrix();
+		// Canvas.rotate(
+		// 	gridControls.getValue( 'xrot' )
+		// );
+
+		line.rotate(
+			gridControls.getValue( 'xrot' )
+		);		
+
 		line.create( start, end, 
 			lineControls.getValue('resolution')
 		);
 
-		mask.maskPointList( line );
+		mask.maskPointList( line );		
 
 		for( let j in line.vertices ) {
 			const vert = line.vertices[j];
@@ -172,29 +181,21 @@ window.draw = function() {
 
 			line.addRandomBreak(
 				j,
-				lambert * lineControls.getValue('lightIntensity'),
+				lambert * lightControls.getValue('lightIntensity'),
 				new TransMatrix.Vector3(
 					0,
 					lineControls.getValue('noiseOffsetY')
-					// frameCount * timeControls.getValue('speed')
 				)
 			);
-
-			// console.log(lambert);
-			// fill(light);
-			// noStroke();
-			// const canvasVert = Canvas.applyMatrix(vert);
-			// circle( canvasVert.x, canvasVert.y, 5 );
-			// noFill();
-			// stroke(0);
 		}
 
 		
 		// line.addRandomBreaks( lineControls.getValue('holiness') );
-		line.render();
+		line.render();	
+		// Canvas.popMatrix();	
 		// line.renderPoints( 2 );
 		
-	}
+	}	
 
 	let polyCircle = new Circle();
 	polyCircle.create(
