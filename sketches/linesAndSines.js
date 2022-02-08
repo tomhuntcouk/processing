@@ -1,5 +1,5 @@
 "use strict";
-
+import Time from '../lib/Time.js';
 import Canvas from '../lib/Canvas.js';
 import Line from '../lib/Line.js';
 import Circle from '../lib/Circle.js';
@@ -21,7 +21,7 @@ const SCALE = 2;
 
 // let circleControls;
 let gridControls, borderControls, sineControls, maskControls, lineControls, circleControls;
-// let timeControls;
+let timeControls;
 
 
 window.setup = function() {
@@ -34,29 +34,41 @@ window.setup = function() {
 	);
 
 	gridControls = Controls.addGroup( 'grid' );
-	gridControls.addControl( 'xres', 1, 100, 1, 2 );
-	// gridControls.addControl( 'xoffset', -width, width, 0, 1 );
+	gridControls.addSlider( 'xres', 1, 100, 1, 2 );
+	gridControls.addSlider( 'xrot', 0, 360, 0, 1 );
+	// gridControls.addSlider( 'xoffset', -width, width, 0, 1 );
 
 	maskControls = Controls.addGroup( 'mask' );
-	maskControls.addControl( 'radius', 1, 100, 1, 1 );
-	maskControls.addControl( 'resolution', 3, 180, 20, 1 );
-	maskControls.addControl( 'rotation', 0, 360, 0, 5 );
-	maskControls.addControl( 'noiseFreq', 0, 0.1, 0, 0.01 );
-	maskControls.addControl( 'noiseAmp', 0, 1, 0, 0.01 );
+	maskControls.addSlider( 'radius', 1, 100, 1, 1 );
+	maskControls.addSlider( 'resolution', 3, 180, 20, 1 );
+	maskControls.addSlider( 'rotation', 0, 360, 0, 5 );
+	maskControls.addSlider( 'noiseFreq', 0, 0.1, 0, 0.01 );
+	maskControls.addSlider( 'noiseAmp', 0, 1, 0, 0.01 );
 
 	lineControls = Controls.addGroup( 'line' );
-	lineControls.addControl( 'resolution', 3, 180, 20, 1 );
-	lineControls.addControl( 'holiness', 0, 1, 0, 0.01 );
+	lineControls.addSlider( 'resolution', 3, 180, 20, 1 );
+	lineControls.addSlider( 'holiness', 0, 1, 0, 0.01 );
+	lineControls.addSlider( 'lightX', -1, 1, 0, 0.01 );
+	lineControls.addSlider( 'lightY', -1, 1, 0, 0.01 );
+	lineControls.addSlider( 'lightZ', -1, 1, 0, 0.01 );
+	lineControls.addSlider( 'lightIntensity', 0, 2, 1, 0.01 );
+	lineControls.addSlider( 'noiseOffsetY', 0, Canvas.height, 0, 0.1 );
 
 	circleControls = Controls.addGroup( 'circle' );
-	circleControls.addControl( 'radius', 0, Canvas.width, 100, 1 );
-	circleControls.addControl( 'rotation', 0, 360, 0, 5 );
-	circleControls.addControl( 'holiness', 0, 1, 0, 0.01 );
+	circleControls.addSlider( 'radius', 0, Canvas.width, 100, 1 );
+	circleControls.addSlider( 'rotation', 0, 360, 0, 5 );
+	circleControls.addSlider( 'holiness', 0, 1, 0, 0.01 );
 
 	sineControls = Controls.addGroup( 'sine' );
-	sineControls.addControl( 'frequency', 0, 10, 1, 1 );
-	sineControls.addControl( 'offset', -1, 1, 0, 0.01 );
-	sineControls.addControl( 'amplitude', 0, 10, 0, 0.01 );
+	sineControls.addSlider( 'frequency', 0, 10, 1, 1 );
+	sineControls.addSlider( 'offset', -1, 1, 0, 0.01 );
+	sineControls.addSlider( 'amplitude', 0, 10, 0, 0.01 );
+
+	timeControls = Controls.addGroup('time');
+	timeControls.addCheckbox( 'play', false );
+	timeControls.addSlider( 'speed', 0, 2, 1, 0.01 );
+	timeControls.addSlider( 'rate', 1, 120, 30, 1 );
+	timeControls.addInput( 'framerate', 0 );
 
 
 	// Renderer.init( drawingContext );
@@ -68,7 +80,23 @@ window.setup = function() {
 
 }
 
-window.draw = function() {
+window.draw = function() {	
+
+	if( timeControls.getValue('play') ) {
+		if( ! isLooping() ) {
+			Time.play();
+			loop();
+		}
+		// timeControls.setValue( 'framerate', frameRate().toFixed(2) );		
+		timeControls.setValue( 'framerate', Time.frameRate.toFixed(2) );		
+	} else {
+		if( isLooping() ) {
+			Time.stop();
+			noLoop();			
+		}		
+	}
+
+	Time.tick();
 	Snapshots.saveLatest();
 
 	clear();
@@ -87,12 +115,8 @@ window.draw = function() {
 		1,
 		Canvas.width * 2,
 		0
-	);
-	// grid.translate( new TransMatrix.Vector3( 
-	// 	-grid.width/2,
-	// 	0, 0
-	// ) );
-	grid.center();
+	);	
+	grid.center();	
 
 	let sine = new Sine().create( 
 		sineControls.getValue( 'frequency' ),
@@ -117,8 +141,13 @@ window.draw = function() {
 
 	let mask = new PolygonMask();
 	mask.createFrom( maskPoly );
-	mask.render();
+	// mask.render();
 	
+	const lightDir = new TransMatrix.Vector3(
+		lineControls.getValue( 'lightX' ),
+		sin( radians(Time.fixedTime * timeControls.getValue('speed')) ),
+		cos( radians(Time.fixedTime * timeControls.getValue('speed')) ),		
+	);
 
 	for( let i=0; i<grid.vertices.length; i++ ) {
 		const gridvert = grid.vertices[i];
@@ -129,27 +158,56 @@ window.draw = function() {
 
 		line.create( start, end, 
 			lineControls.getValue('resolution')
-		);		
+		);
 
 		mask.maskPointList( line );
-		line.addRandomBreaks( lineControls.getValue('holiness') );
+
+		for( let j in line.vertices ) {
+			const vert = line.vertices[j];
+			const normal = maskPoly.normalAtPoint( vert );			
+			
+			const lambert = TransMatrix.Vector3.dot( normal, lightDir );
+			let col = [ normal.x * 255, normal.y * 255, normal.z * 255 ];
+			let light = lambert * 255;
+
+			line.addRandomBreak(
+				j,
+				lambert * lineControls.getValue('lightIntensity'),
+				new TransMatrix.Vector3(
+					0,
+					lineControls.getValue('noiseOffsetY')
+					// frameCount * timeControls.getValue('speed')
+				)
+			);
+
+			// console.log(lambert);
+			// fill(light);
+			// noStroke();
+			// const canvasVert = Canvas.applyMatrix(vert);
+			// circle( canvasVert.x, canvasVert.y, 5 );
+			// noFill();
+			// stroke(0);
+		}
+
+		
+		// line.addRandomBreaks( lineControls.getValue('holiness') );
 		line.render();
-		// line.renderPoints();
+		// line.renderPoints( 2 );
 		
 	}
 
-	let circle = new Circle();
-	circle.create(
+	let polyCircle = new Circle();
+	polyCircle.create(
 		circleControls.getValue('radius'),
 		360
 	);	
-	circle.addRandomBreaks( 
+	polyCircle.addRandomBreaks( 
 		circleControls.getValue('holiness')
 	);
-	circle.rotate( 
+	polyCircle.rotate( 
 		circleControls.getValue('rotation')
 	);
-	circle.render();
+	polyCircle.render();
 
 
 	

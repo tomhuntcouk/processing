@@ -11,24 +11,28 @@ main {
 }
 
 #interface {
-	width: fit-content;
-	float: right;
+	height: 100%;
+	/*width: fit-content;*/
+	/*float: right;*/
 	position: fixed;
-	right: 50px;
+	right: 0px;
+	/*background: red;*/
 }
 
-#controls {
-	width : fit-content;
-	height:  fit-content;	
-	/*float: right;*/
+#controls {	
+	width: 600px;
+	height:  100%;	
+	display: flex;
+	flex-flow:  column wrap;
 }
 
 .controls-group {
+	width: 280px;
 	border: solid 1px;
 	padding: 4px;
 	margin-bottom: 10px;
 	border-radius: 4px;
-	background: lightgray;
+	background: lightgray;	
 }
 
 .controls-group .controls-group-title {
@@ -41,12 +45,46 @@ main {
 	font-variant: small-caps;
 }
 
+.control-container {
+	display: flex;
+}
+
+.control-label {
+	width:  100px;
+	display: inline-block;
+	/*background: red;*/
+	/*right: 0px;*/
+}
+
+.control-display {
+	width:  30px;
+	display: inline-block;
+	text-align: right;
+	margin-left: 10px;
+	border-radius: 4px;
+	border: 1px;
+	padding: 2px;
+	/*float: right;*/
+}
+
+.control-control {
+	flex-grow: 1;
+	/*width: 100px;*/
+	display: inline-block;
+}
+
+#renderer button.renderer-button {
+	width: 100%;
+}
 
 #snapshots {
-	width: 100%;
-	/*height: 100%;*/
-	/*background: blue;*/
-	/*float: right;*/
+	width: 280px;
+	border: solid 1px;
+	padding: 4px;
+	margin-bottom: 10px;
+	border-radius: 4px;
+	background: lightgray;
+	height: 80px;
 }
 
 .snapshot-container {
@@ -56,6 +94,9 @@ main {
 #snapshots button {
 	width: 25px;
 	height: 25px;
+	font-variant: small-caps;
+	font-size: small;
+	font-weight: bold;
 }
 
 #snapshots button.add-snapshot-btn {
@@ -71,21 +112,5 @@ main {
 	display: none;
 }
 
-.slider-label {
-	width:  100px;
-	display: inline-block;
-}
 
-.slider-display {
-	width:  30px;
-	display: inline-block;
-	text-align: right;
-	margin-left: 10px;
-	border-radius: 4px;
-	border: 1px;
-	padding: 2px;
-}
 
-#renderer button.renderer-button {
-	width: 100%;
-}
