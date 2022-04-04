@@ -10,26 +10,40 @@ main {
 	float: left;	
 }
 
+button {
+	font-variant: small-caps;
+	font-size: small;
+	font-weight: bold;
+	border: solid 1px;
+	padding: 4px;
+	margin: 2px;
+	margin-bottom: 10px;
+	border-radius: 4px;
+}
+
 #interface {
 	height: 100%;
-	/*width: fit-content;*/
+	width: fit-content;
+	display: flex;
 	/*float: right;*/
 	position: fixed;
-	right: 0px;
+	right: -0px;
 	/*background: red;*/
 }
 
 #controls {	
-	width: 600px;
 	height:  100%;	
 	display: flex;
-	flex-flow:  column wrap;
+	flex-flow:  column wrap-reverse;
+	padding-right: 10px;
+	/*background: blue;*/
 }
 
 .controls-group {
-	width: 280px;
+	max-width: 280px;
 	border: solid 1px;
 	padding: 4px;
+	margin-left: 10px;
 	margin-bottom: 10px;
 	border-radius: 4px;
 	background: lightgray;	
@@ -89,8 +103,15 @@ main {
 	width: 30px;
 }
 
-#renderer button.renderer-button {
-	width: 100%;
+#renderer {
+	display: flex;
+}
+
+#renderer .renderer-btn {
+	/*width: 100%;*/
+	flex-grow: 1;
+	/*background: red;*/
+
 }
 
 #snapshots {
@@ -100,7 +121,7 @@ main {
 	margin-bottom: 10px;
 	border-radius: 4px;
 	background: lightgray;
-	height: 80px;
+	/*height: 80px;*/
 }
 
 .snapshot-container {
@@ -109,10 +130,7 @@ main {
 
 #snapshots button {
 	width: 25px;
-	height: 25px;
-	font-variant: small-caps;
-	font-size: small;
-	font-weight: bold;
+	height: 25px;	
 }
 
 #snapshots button.add-snapshot-btn {
