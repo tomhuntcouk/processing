@@ -1,15 +1,14 @@
 "use strict";
 import Time from '../lib/Time.js';
 import Canvas from '../lib/Canvas.js';
-import Shape from '../lib/Shape.js';
 import Line from '../lib/Line.js';
 import Circle from '../lib/Circle.js';
 import Grid from '../lib/Grid.js';
 import Border from '../lib/Border.js';
 import PolygonMask from '../lib/PolygonMask.js';
 import Sine from '../lib/Sine.js';
-import HilbertCurve from "../lib/SpaceFillingCurves.js";
-import LSystem from "../lib/LSystem.js";
+
+import LSystem from '../lib/LSystem.js';
 
 import Controls from '../lib/Controls.js';
 import Snapshots from '../lib/Snapshots.js';
@@ -17,14 +16,13 @@ import Snapshots from '../lib/Snapshots.js';
 
 import * as TransMatrix from '../lib/Matrix.js';
 
-const NAME = 'SpaceFillingCurves';
+const NAME = 'LinesAndSines';
 const WIDTH = 150;
 const HEIGHT = 150;
 const SCALE = 2;
 
 // let circleControls;
-let gridControls, borderControls, sineControls, maskControls, lineControls, circleControls, lightControls;
-let curveControls;
+let gridControls, borderControls, sineControls, maskControls, lineControls, circleControls, lightControls, curveControls;
 let timeControls;
 
 
@@ -63,8 +61,15 @@ window.setup = function() {
 	curveControls = Controls.addGroup( 'curve' );
 	curveControls.addSlider( 'order', 1, 8, 1, 1 );
 	curveControls.addSlider( 'scale', 1, Canvas.height, 1, 1 );	
-	curveControls.addSlider( 'max', 0, 512, 1, 1 );
+	curveControls.addSlider( 'max', 0, 50, 1, 1 );
 	curveControls.addSlider( 'smoothness', 0, 4, 0, 1 );
+	curveControls.addSlider( 'angle', 0, 360, 0, 1 );
+
+	// lightControls = Controls.addGroup( 'light' );
+	// lightControls.addSlider( 'lightX', -180, 180, 0, 1 );
+	// lightControls.addSlider( 'lightY', -180, 180, 0, 1 );
+	// lightControls.addSlider( 'lightZ', -180, 180, 0, 1 );
+	// lightControls.addSlider( 'lightIntensity', 0, 2, 1, 0.01 );
 
 	sineControls = Controls.addGroup( 'sine' );
 	sineControls.addSlider( 'frequency', 0, 10, 1, 1 );
@@ -104,46 +109,37 @@ window.draw = function() {
 	stroke(0);
 	background(255, 243, 212);	
 
-	// curve = new HilbertCurve();
-	// curve.create( 
-	// 	2 ** curveControls.getValue( 'resolution' ),
-	// 	curveControls.getValue( 'scale' ),
-	// 	curveControls.getValue( 'offset' )
-	// );
 
-	// curve.render();
+	let l1 = new LSystem();
+	let l2 = new LSystem();
+	l1.initPenroseTile();
+	// l1.setAngle( 36 );
+	// l1.initMooreCurve();
+	// l1.setAngle(90);
 
+	l2.setAxiom( 'X' );
+	l2.addRule( 'X', 'F++F[+F]F' );
+	l2.setAngle(45);
 
-	curve = new LSystem();
-	curve.initMooreCurve();
-	curve.create(
+	// l.setAngle( curveControls.getValue('angle') );
+	l1.create(
 		curveControls.getValue('order'),
 		curveControls.getValue('scale'),
 		// curveControls.getValue('max'),
 	);
-	
-	curve.smooth(
-		curveControls.getValue('smoothness'),
-	);
-	
 
+	// l2.create(
+	// 	curveControls.getValue('order'),
+	// 	curveControls.getValue('scale'),
+	// 	curveControls.getValue('max'),
+	// );
 
-	const mask = new PolygonMask();
-	mask.createCircle(
-		maskControls.getValue('radius'),
-		maskControls.getValue('resolution'),
-	);
-
-	// mask.intersectPointList( curve );
-	// mask.clipPointList(curve);
-
-
-	curve.close();	
-	curve.render();
-	// curve.renderPoints();
-
-
-
+	// l.updateBounds();
+	// l.center( true, false );
+	l1.render(close=false);
+	l1.renderBounds();
+	// l1.renderPoints(10000, 30);
+	// l2.render(close=false);
 
 	
 }
